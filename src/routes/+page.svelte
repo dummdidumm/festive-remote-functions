@@ -2,6 +2,7 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import { getChildrenList, toggleProcessed } from './data.remote';
 	import ChildDetails from './ChildDetails.svelte';
+	import Stats from './Stats.svelte';
 
 	const expandedIds = new SvelteSet<string>();
 
@@ -47,6 +48,8 @@
 		<h1>🎅 Santa's Workshop Dashboard</h1>
 		<p class="subtitle">Managing children's wish lists</p>
 	</header>
+
+	<Stats />
 
 	<div class="wish-list-container">
 		<div class="list-header">

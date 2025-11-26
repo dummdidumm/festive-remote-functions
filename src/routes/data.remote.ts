@@ -1,6 +1,20 @@
 import * as v from 'valibot';
-import { query, form, command } from '$app/server';
+import { query, form, command, prerender } from '$app/server';
 import { childrenDb, type Comment } from './mock-db';
+
+export const getHolidayStats = prerender(async () => {
+	const totalChildren = childrenDb.length;
+	const totalWishes = childrenDb.reduce((sum, child) => sum + child.wishes.length, 0);
+	const averageKindness = Math.round(
+		childrenDb.reduce((sum, child) => sum + child.kindness, 0) / totalChildren
+	);
+
+	return {
+		totalChildren,
+		totalWishes,
+		averageKindness
+	};
+});
 
 export const getChildrenList = query(async () => {
 	return childrenDb.map((child) => ({
