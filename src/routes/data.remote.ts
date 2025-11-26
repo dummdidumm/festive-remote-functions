@@ -68,14 +68,12 @@ export const addComment = form(
 		child.comments.push(newComment);
 
 		await getChildDetails(childId).refresh();
-
-		return { success: true };
 	}
 );
 
 export const toggleProcessed = command(v.string(), async (childId: string) => {
 	// Simulate network delay
-	await new Promise((resolve) => setTimeout(resolve, 100));
+	await new Promise((resolve) => setTimeout(resolve, 1100));
 
 	const child = childrenDb.find((c) => c.id === childId);
 	if (!child) {

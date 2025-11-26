@@ -24,11 +24,6 @@
 		}
 	}
 
-	async function handleToggleProcessed(e: Event, childId: string) {
-		e.stopPropagation();
-		await toggleProcessed(childId);
-	}
-
 	function getKindnessColor(kindness: number): string {
 		if (kindness >= 80) return '#22c55e';
 		if (kindness >= 60) return '#84cc16';
@@ -74,7 +69,16 @@
 							<input
 								type="checkbox"
 								checked={child.processed}
-								onchange={(e) => handleToggleProcessed(e, child.id)}
+								onchange={() => {
+									toggleProcessed(child.id).updates(
+										getChildrenList().withOverride((list) => {
+											return list.map((c) => ({
+												...c,
+												processed: c.id === child.id ? !c.processed : c.processed
+											}));
+										})
+									);
+								}}
 							/>
 							<span class="checkmark"></span>
 						</label>
