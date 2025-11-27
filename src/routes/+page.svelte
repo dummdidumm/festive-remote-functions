@@ -396,20 +396,9 @@
 			font-size: 1.8rem;
 		}
 
-		.list-header {
-			display: none;
-		}
-
 		.child-header {
 			flex-wrap: wrap;
 			padding: 1rem;
-		}
-
-		.kindness-cell {
-			max-width: none;
-			width: 100%;
-			order: 5;
-			margin-top: 0.5rem;
 		}
 	}
 </style>
