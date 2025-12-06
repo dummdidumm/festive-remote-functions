@@ -18,7 +18,7 @@ interface Child {
 	comments: Comment[];
 }
 
-export const childrenDb: Child[] = [
+export const db: Child[] = [
 	{
 		id: '1',
 		name: 'Emma Thompson',
@@ -93,3 +93,37 @@ export const childrenDb: Child[] = [
 		comments: [{ id: 'c5', text: 'Needs to work on sharing', timestamp: new Date('2025-11-10') }]
 	}
 ];
+
+export function getList() {
+	return db.map((child) => ({
+		id: child.id,
+		name: child.name,
+		kindness: child.kindness,
+		processed: child.processed,
+		wishCount: child.wishes.length
+	}));
+}
+
+export function getAll() {
+	return db;
+}
+
+export function addComment(childId: string, comment: string) {
+	const child = db.find((c) => c.id === childId);
+	if (!child) {
+		throw new Error('Child not found');
+	}
+	child.comments.push({
+		id: `c${child.comments.length + 1}`,
+		text: comment,
+		timestamp: new Date()
+	});
+}
+
+export function toggleProcessed(childId: string) {
+	const child = db.find((c) => c.id === childId);
+	if (!child) {
+		throw new Error('Child not found');
+	}
+	child.processed = !child.processed;
+}

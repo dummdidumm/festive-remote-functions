@@ -1,29 +1,9 @@
 import * as v from 'valibot';
 import { query, form, command, prerender } from '$app/server';
-import { childrenDb, type Comment } from './mock-db';
-
-export const getHolidayStats = prerender(async () => {
-	const totalChildren = childrenDb.length;
-	const totalWishes = childrenDb.reduce((sum, child) => sum + child.wishes.length, 0);
-	const averageKindness = Math.round(
-		childrenDb.reduce((sum, child) => sum + child.kindness, 0) / totalChildren
-	);
-
-	return {
-		totalChildren,
-		totalWishes,
-		averageKindness
-	};
-});
+import * as db from './mock-db';
 
 export const getChildrenList = query(async () => {
-	return childrenDb.map((child) => ({
-		id: child.id,
-		name: child.name,
-		kindness: child.kindness,
-		processed: child.processed,
-		wishCount: child.wishes.length
-	}));
+	return db.getList();
 });
 
 export const getChildDetails = query.batch(v.string(), async (ids: string[]) => {
@@ -31,7 +11,8 @@ export const getChildDetails = query.batch(v.string(), async (ids: string[]) => 
 	await new Promise((resolve) => setTimeout(resolve, 200));
 
 	const lookup = new Map(
-		childrenDb
+		db
+			.getAll()
 			.filter((child) => ids.includes(child.id))
 			.map((child) => [
 				child.id,
@@ -54,18 +35,7 @@ export const addComment = form(
 		// Simulate network delay
 		await new Promise((resolve) => setTimeout(resolve, 150));
 
-		const child = childrenDb.find((c) => c.id === childId);
-		if (!child) {
-			throw new Error('Child not found');
-		}
-
-		const newComment: Comment = {
-			id: `c${Date.now()}`,
-			text: commentText,
-			timestamp: new Date()
-		};
-
-		child.comments.push(newComment);
+		db.addComment(childId, commentText);
 
 		await getChildDetails(childId).refresh();
 	}
@@ -75,12 +45,22 @@ export const toggleProcessed = command(v.string(), async (childId: string) => {
 	// Simulate network delay
 	await new Promise((resolve) => setTimeout(resolve, 1100));
 
-	const child = childrenDb.find((c) => c.id === childId);
-	if (!child) {
-		throw new Error('Child not found');
-	}
-
-	child.processed = !child.processed;
+	db.toggleProcessed(childId);
 
 	await getChildrenList().refresh();
+});
+
+export const getHolidayStats = prerender(() => {
+	const allChildren = db.getAll();
+	const totalChildren = allChildren.length;
+	const averageKindness = Math.round(
+		allChildren.reduce((sum, c) => sum + c.kindness, 0) / totalChildren
+	);
+	const totalWishes = allChildren.reduce((sum, c) => sum + c.wishes.length, 0);
+
+	return {
+		totalChildren,
+		averageKindness,
+		totalWishes
+	};
 });
